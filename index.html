@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLO Maps - San Luis Obispo Business &amp; Community Maps</title>
+    <meta name="description" content="Interactive maps of San Luis Obispo businesses, from historical business licenses to community data. Explore SLO City through maps.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            background: linear-gradient(135deg, #1a3c6e 0%, #2a6496 50%, #3a8cc6 100%);
+            color: white;
+            padding: 60px 20px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        .hero-content {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .hero h1 span {
+            color: #7ec8e3;
+        }
+        .hero .tagline {
+            font-size: 1.15rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        /* --- Map Cards --- */
+        .maps-section {
+            max-width: 1100px;
+            margin: -30px auto 40px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .map-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .map-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .card-preview {
+            height: 220px;
+            background: #e8eef5;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-preview iframe {
+            width: 200%;
+            height: 200%;
+            transform: scale(0.5);
+            transform-origin: top left;
+            border: none;
+            pointer-events: none;
+        }
+        .card-preview .overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.03) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-preview .overlay .play-btn {
+            background: rgba(26, 60, 110, 0.9);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .map-card:hover .play-btn {
+            opacity: 1;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .card-body h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a3c6e;
+            margin-bottom: 6px;
+        }
+        .card-body p {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+        .card-tags {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .tag {
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: #eef3f9;
+            color: #2a6496;
+        }
+
+        /* --- Coming Soon Card --- */
+        .coming-soon .card-preview {
+            background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .coming-soon .card-preview .placeholder {
+            font-size: 3rem;
+            opacity: 0.3;
+        }
+        .coming-soon {
+            opacity: 0.65;
+            pointer-events: none;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+            font-size: 0.8rem;
+            border-top: 1px solid #eee;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        footer a {
+            color: #2a6496;
+            text-decoration: none;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2rem; }
+            .hero { padding: 40px 16px 40px; }
+            .maps-section { margin-top: -20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>SLO<span>Maps</span>.com</h1>
+            <p class="tagline">Interactive maps exploring San Luis Obispo's businesses and community</p>
+        </div>
+    </div>
+
+    <section class="maps-section">
+        <div class="card-grid">
+
+            <!-- Active Business Licenses Map -->
+            <a href="map.html" class="map-card">
+                <div class="card-preview">
+                    <iframe src="map.html" loading="lazy" tabindex="-1"></iframe>
+                    <div class="overlay">
+                        <div class="play-btn">Open Interactive Map</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3>Active Business Licenses</h3>
+                    <p>Explore 12 years of SLO City business license data (2015&ndash;2026).
+                       Filter by business category, slide through years, and click any
+                       location to see every business that operated there.</p>
+                    <div class="card-tags">
+                        <span class="tag">2015&ndash;2026</span>
+                        <span class="tag">5,300+ Locations</span>
+                        <span class="tag">48,000 Records</span>
+                        <span class="tag">Interactive</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Placeholder for future maps -->
+            <div class="map-card coming-soon">
+                <div class="card-preview">
+                    <div class="placeholder">&#127758;</div>
+                </div>
+                <div class="card-body">
+                    <h3>More Maps Coming Soon</h3>
+                    <p>Additional SLO community maps are in development.
+                       Check back for new datasets and visualizations.</p>
+                    <div class="card-tags">
+                        <span class="tag">Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <p>
+            Business license data sourced from the
+            <a href="https://www.slocity.org/services/how-do-i/view/active-business-licenses" target="_blank">
+                City of San Luis Obispo &mdash; Active Business Licenses Report
+            </a>
+        </p>
+        <p style="margin-top: 6px;">
+            &copy; 2025 SLOMaps.com
+        </p>
+    </footer>
+
+</body>
+</html>
